@@ -78,6 +78,7 @@ public class ModificacionAdmin {
 		comboBox.setBounds(182, 36, 242, 20);
 		List<Usuario> administradores = ManejadorBD.getAdministradores();
 		List<String> usernames = new ArrayList<String>();
+		usernames.add("Elegir admin...");
 		for(int i=0; i< administradores.size(); i++ ) {
 			String username = administradores.get(i).getUsername();
 			usernames.add(username);
@@ -109,7 +110,7 @@ public class ModificacionAdmin {
 		frmModificaionAdministrador.getContentPane().add(lblAntiguoMail);
 		
 		textFieldViejoMail = new JTextField();
-		textFieldViejoMail.setEditable(false);
+		textFieldViejoMail.setEnabled(false);
 		textFieldViejoMail.setColumns(10);
 		textFieldViejoMail.setBounds(182, 84, 242, 20);
 		frmModificaionAdministrador.getContentPane().add(textFieldViejoMail);
@@ -123,55 +124,52 @@ public class ModificacionAdmin {
 		textFieldNuevoMail.setBounds(182, 110, 242, 20);
 		frmModificaionAdministrador.getContentPane().add(textFieldNuevoMail);
 		
-		JLabel lblDarquitarPrivilegios = new JLabel("Dar/Quitar Privilegios");
-		lblDarquitarPrivilegios.setBounds(10, 168, 119, 14);
-		frmModificaionAdministrador.getContentPane().add(lblDarquitarPrivilegios);
-		
-		JCheckBox chckbxQuitar = new JCheckBox("Quitar");
-		chckbxQuitar.setBounds(182, 159, 55, 23);
-		frmModificaionAdministrador.getContentPane().add(chckbxQuitar);
-		
-		JCheckBox chckbxDar = new JCheckBox("Dar");
-		chckbxDar.setBounds(266, 159, 97, 23);
-		frmModificaionAdministrador.getContentPane().add(chckbxDar);
-		
 		JLabel lblCreaNodos = new JLabel("Crea Nodos?");
-		lblCreaNodos.setBounds(10, 194, 97, 14);
+		lblCreaNodos.setBounds(10, 167, 97, 14);
 		frmModificaionAdministrador.getContentPane().add(lblCreaNodos);
 		
 		JCheckBox chckbxSi = new JCheckBox("Si");
-		chckbxSi.setBounds(182, 185, 55, 23);
+		chckbxSi.setBounds(182, 163, 55, 23);
 		frmModificaionAdministrador.getContentPane().add(chckbxSi);
 		
 		JCheckBox chckbxNo = new JCheckBox("No");
-		chckbxNo.setBounds(269, 185, 55, 23);
+		chckbxNo.setBounds(264, 163, 55, 23);
 		frmModificaionAdministrador.getContentPane().add(chckbxNo);
 		
 		JLabel lblCambiarContrasea = new JLabel("Cambiar contrase\u00F1a?");
-		lblCambiarContrasea.setBounds(10, 142, 119, 14);
+		lblCambiarContrasea.setBounds(10, 142, 158, 14);
 		frmModificaionAdministrador.getContentPane().add(lblCambiarContrasea);
 		
 		JCheckBox chckbxNewCheckBox = new JCheckBox("Si");
-		chckbxNewCheckBox.setBounds(122, 137, 46, 23);
+		chckbxNewCheckBox.setBounds(132, 137, 46, 23);
 		frmModificaionAdministrador.getContentPane().add(chckbxNewCheckBox);
 		
 		JLabel lblVieja = new JLabel("Vieja");
+		lblVieja.setEnabled(false);
 		lblVieja.setBounds(182, 142, 46, 14);
 		frmModificaionAdministrador.getContentPane().add(lblVieja);
 		
 		textField_1 = new JTextField();
+		textField_1.setEnabled(false);
 		textField_1.setBounds(216, 136, 86, 20);
 		frmModificaionAdministrador.getContentPane().add(textField_1);
 		textField_1.setColumns(10);
 		
 		JLabel lblNueva = new JLabel("Nueva");
+		lblNueva.setEnabled(false);
 		lblNueva.setBounds(305, 142, 46, 14);
 		frmModificaionAdministrador.getContentPane().add(lblNueva);
 		
 		textField_2 = new JTextField();
+		textField_2.setEnabled(false);
 		textField_2.setBounds(338, 136, 86, 20);
 		frmModificaionAdministrador.getContentPane().add(textField_2);
 		textField_2.setColumns(10);
+		
+		JLabel lblAvisoCreaNodos = new JLabel("");
+		lblAvisoCreaNodos.setForeground(new Color(154, 205, 50));
+		lblAvisoCreaNodos.setBounds(123, 193, 228, 14);
+		frmModificaionAdministrador.getContentPane().add(lblAvisoCreaNodos);
 		
 		comboBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
@@ -181,17 +179,23 @@ public class ModificacionAdmin {
                 
                 Usuario usuario = ManejadorBD.getUsuario(username);
                 textFieldViejoMail.setText(usuario.getMail());
-                boolean privilegios = (usuario.getNivel_acceso()=="AP") ? true : false;
-                if(privilegios) {
-                	chckbxDar.setEnabled(false);
-                }else {
-                	chckbxQuitar.setEnabled(false);
-                }
                 boolean creaNodos = usuario.isCrea_nodos();
+                if(creaNodos) {
+                	chckbxSi.setSelected(false);
+                	chckbxSi.setEnabled(false);
+                	lblAvisoCreaNodos.setText("Actualmente CREA NODOS");
+                }else {
+                	chckbxNo.setSelected(false);
+                	chckbxNo.setEnabled(false);
+                	lblAvisoCreaNodos.setForeground(Color.RED);
+                	lblAvisoCreaNodos.setText("Actualmente  NO CREA NODOS");
+                }
                
             }
         });
 		frmModificaionAdministrador.getContentPane().add(comboBox);
+		
+		
 	}
 
 	
