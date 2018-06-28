@@ -13,6 +13,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="C:/Proy2018/TwilioSms/WebContent/WEB-INF/lib/twilio-7.21.3-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="C:/ProyectoGit/TwilioSms/WebContent/WEB-INF/lib/twilio-7.21.3-jar-with-dependencies.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
