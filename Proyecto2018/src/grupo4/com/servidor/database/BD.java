@@ -12,6 +12,7 @@ import java.util.Map;
 
 import grupo4.com.core.modelJEE.EventoGCabezal;
 import grupo4.com.core.modelJEE.EventoGConf;
+import grupo4.com.core.modelJEE.EventoGIdYFechaInactivo;
 import grupo4.com.core.modelJEE.NivelesAlertasEG;
 import grupo4.com.core.modelJEE.Notis;
 import grupo4.com.core.modelJEE.SuscripcionEG;
@@ -846,6 +847,58 @@ public class BD {
 			UtilBase.cerrarComponentes(null, rs, st, c);
 		}
 		return notis;
+	}
+
+	public List<EventoGIdYFechaInactivo> getListaEventosInactivos(Log log) {
+		String sql		= "";
+		List<EventoGIdYFechaInactivo> eventosInactivos = null;
+		Connection c 	= null;
+		Statement st 	= null;
+		ResultSet rs	= null;
+		try {
+			log.log("Recuperando lista de eventos inactivos en BD....");
+			eventosInactivos = new ArrayList<EventoGIdYFechaInactivo>();
+			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
+			sql = "SELECT id_evento, nombre_evento, admin_alta, inactivo_desde FROM eventos_globales WHERE activo=false";
+			st = c.createStatement();
+			rs = st.executeQuery(sql);
+			while (rs.next()) {
+				EventoGIdYFechaInactivo eventoInac = new EventoGIdYFechaInactivo();
+				eventoInac.setUsuarioCreador(rs.getString("admin_alta"));
+				eventoInac.setIdEvento(rs.getLong("id_evento"));
+				eventoInac.setFechaInactividad( rs.getString("inactivo_desde"));
+				eventoInac.setNombreEvento(rs.getString("nombre_evento"));
+				eventosInactivos.add(eventoInac);
+			}
+		}catch(Throwable t) {
+			log.log("No fue posible recuperar lista de eventos inactivos en BD. SQL ["+sql+"]. debido a ["+t.getMessage()+"]");
+		}finally {
+			UtilBase.cerrarComponentes(log, rs, st, c);
+		}
+		return eventosInactivos;
+	}
+
+	public boolean eliminarConfEventosInactivos(long idEvento, Log log) {
+		boolean borrado = false;
+		Connection c = null;
+		Statement st = null;
+		int  rs = 0;
+		String sql = null;
+		
+		try {
+			log.log("Se elimina configuraciones de Evento GLOBAL INACTIVOS :["+idEvento+"]");
+			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
+			sql = "DELETE FROM conf_eventos_globales WHERE id_evento = "+idEvento+";";
+			st = c.createStatement();
+			rs = st.executeUpdate(sql);
+			borrado = (rs > 0) ? true : false;
+			log.log("Evento  ["+idEvento+"] ELIMINADO CON EXITO POR INACTIVIDAD ");
+		} catch(Throwable t) {
+			log.log("No es posible eliminar EVENTO GLOBAL POR INACTIVIDAD["+idEvento+"] Error:["+t.getMessage()+"].SQL ["+sql+"]", t);
+		} finally {
+			UtilBase.cerrarComponentes(null, null, st, c);
+		}
+		return borrado;
 	}
 	
 	

@@ -45,6 +45,8 @@ public class Schedule extends HttpServlet implements ServletContextListener {
 			//Demonio cada 1 dia para borrar eventos inactivos por mas de 50 dias
 			//JobDetail jobEliminarInactivos = JobBuilder.newJob(JobsEliminarEventosGlobalesInactivos.class).withIdentity("DemonioBorrarInactivos", "BorrarInactivos").build();
 			
+			/*Trigger triggerEliminar = TriggerBuilder.newTrigger().withIdentity("triggerDemonioEliminar",  "BorrarInactivos")
+					.withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 1/1 * ? *")).build();*/
 			
 			scheduler.scheduleJob(job, trigger);
 			

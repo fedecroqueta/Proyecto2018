@@ -5,6 +5,7 @@ public class InfoDisco {
 	private String mount;
 	private float espacioTotal;
 	private float espacioDisponible;
+	private String fecha;
 	
 	
 	public InfoDisco() {
@@ -35,6 +36,14 @@ public class InfoDisco {
 	}
 	public void setEspacioDisponible(float espacioDisponible) {
 		this.espacioDisponible = espacioDisponible;
+	}
+
+	public String getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(String fecha) {
+		this.fecha = fecha;
 	}
 	
 	

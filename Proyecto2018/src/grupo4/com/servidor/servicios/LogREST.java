@@ -204,14 +204,19 @@ public class LogREST {
 		return Response.ok(agente).build();
 	}
 	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	@Path("/infoAgente/{nodo}/{fecha}")
-	public Response getAgente(@PathParam("nodo") String nodo, @PathParam("fecha") String fecha) {
-		
-		List<LogAgente> agente = ml.getAgenteUsuarioPorFecha(nodo, fecha);
-		
-		return Response.ok(agente).build();
+	@Path("/infoAgente/{nodo}/{fechaInicio}/{fechaFin}")
+	public Response getAgente(@PathParam("nodo") String nodo, @PathParam("fechaInicio") String fechaInicio, @PathParam("fechaFin") String fechaFin) {
+		try {
+			List<LogAgente> agente = ml.getAgenteUsuarioPorFecha(nodo, fechaInicio, fechaFin);
+			
+			return Response.ok(agente).build();
+		}
+		catch( Throwable t) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 
 }

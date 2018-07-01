@@ -5,6 +5,7 @@ public class InfoMemoria {
 	private int memoriaLibre;
 	private int memoriaTotal;
 	private int memoriaEnUso;
+	private String fecha;
 	
 	
 	public InfoMemoria(int memoriaLibre, int memoriaTotal, int memoriaEnUso) {
@@ -40,6 +41,15 @@ public class InfoMemoria {
 	public void setMemoriaEnUso(int memoriaEnUso) {
 		this.memoriaEnUso = memoriaEnUso;
 	}
+
+	public String getFecha() {
+		return fecha;
+	}
+
+	public void setFecha(String fecha) {
+		this.fecha = fecha;
+	}
+	
 	
 	
 }

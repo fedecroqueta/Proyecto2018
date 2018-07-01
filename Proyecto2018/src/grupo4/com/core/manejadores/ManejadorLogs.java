@@ -1,33 +1,22 @@
 package grupo4.com.core.manejadores;
 
-import org.bson.Document;
-import org.bson.codecs.configuration.CodecProvider;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bson.conversions.Bson;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.Block;
+import org.bson.Document;
+
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import org.bson.codecs.configuration.CodecProvider;
-import org.bson.codecs.configuration.CodecRegistry;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import static com.mongodb.client.model.Filters.eq;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import com.mongodb.client.model.Filters;
 
 import grupo4.com.core.modelJEE.InfoCabezalNodo;
@@ -36,6 +25,7 @@ import grupo4.com.core.modelJEE.InfoDisco;
 import grupo4.com.core.modelJEE.InfoMemoria;
 import grupo4.com.core.modelJSON.LogAgente;
 import grupo4.com.util.Log;
+import grupo4.com.util.UtilFormato;
 import  grupo4.com.util.UtilMongo;
 
 @SuppressWarnings("unused")
@@ -100,10 +90,13 @@ public class ManejadorLogs {
 			int auxRes =0;
 			int auxMemTotal = 0;
 			int auxMemEnUso = 0;
+			String fechaAPoner = "";
 			for (Document docIte : ultimo) {
 				String ult = docIte.getString("FreeMemory");
 				String ultiMemoriaTotal = docIte.getString("TotalMemoryMB");
 				String ultMemEnUso = docIte.getString("MemoryInUse");
+				fechaAPoner = UtilFormato.mongoTimeToDate(docIte.getString("Time"));
+
 				int auxBytes = Integer.parseInt(ult);
 				auxRes = auxBytes/1024;
 				auxMemTotal = Integer.parseInt(ultiMemoriaTotal);
@@ -111,6 +104,7 @@ public class ManejadorLogs {
 				auxMemEnUso = Integer.parseInt(ultMemEnUso);
 				auxMemEnUso = auxMemEnUso/1024;
 			}
+			resultado.setFecha(fechaAPoner);
 			resultado.setMemoriaEnUso(auxMemEnUso);
 			resultado.setMemoriaLibre(auxRes);
 			resultado.setMemoriaTotal(auxMemTotal);
@@ -152,6 +146,8 @@ public class ManejadorLogs {
 				String ult = docIte.getString("FreeMemory");
 				String ultiMemoriaTotal = docIte.getString("TotalMemoryMB");
 				String ultMemEnUso = docIte.getString("MemoryInUse");
+				//Tratamiento de fecha
+				String fechaAPoner = UtilFormato.mongoTimeToDate(docIte.getString("Time"));
 				int auxBytes = Integer.parseInt(ult);
 				auxRes = auxBytes/1024;
 				auxMemTotal = Integer.parseInt(ultiMemoriaTotal);
@@ -161,9 +157,9 @@ public class ManejadorLogs {
 				info.setMemoriaEnUso(auxMemEnUso);
 				info.setMemoriaLibre(auxRes);
 				info.setMemoriaTotal(auxMemTotal);
+				info.setFecha(fechaAPoner);
 				resultado.add(info);
 			}
-			String pausa = null;
 		}catch(Throwable t){
 			log.log("No es posible devolver info de disco de ["+nodo+"] debido a ["+t.getMessage()+"]");
 		}finally {
@@ -200,6 +196,8 @@ public class ManejadorLogs {
 					String espacioTotal = detalle.getString("spacetotal");
 					String spliEsDispo = espacioDispo.split("G")[0];
 					String spliEsTot = espacioTotal.split("G")[0];
+					String fechaAPoner = UtilFormato.mongoTimeToDate(entrada.getString("Time"));
+					resultado.setFecha(fechaAPoner);
 					resultado.setEspacioDisponible(Float.parseFloat(spliEsDispo));
 					resultado.setEspacioTotal(Float.parseFloat(spliEsTot)); 
 				}
@@ -239,15 +237,15 @@ public class ManejadorLogs {
 			for (Document docIte : lista) {
 				tamaLista++;
 				InfoCpu info = new InfoCpu();
-				long unix_time = Long.parseLong(docIte.getString("Time"));
-				Date date = new Date ();
-				date.setTime((long)unix_time*1000);
-				Date date2 = Date.from( Instant.ofEpochSecond(Long.parseLong(docIte.getString("Time"))));
+				//Tratamiento de fecha
+				String fechaAPoner = UtilFormato.mongoTimeToDate(docIte.getString("Time"));
+
+				
+				info.setFecha(fechaAPoner);
 				info.setCpuLoad(Double.parseDouble(docIte.getString("CPULoad")));
 				info.setNumeroCpus(Integer.parseInt(docIte.getString("NumberOfCPUs")));
 				resultado.add(info);
 			}
-			String pausa = null;
 		}catch(Throwable t){
 			log.log("No es posible devolver info de CPU de ["+nodo+"] debido a ["+t.getMessage()+"]");
 		}finally {
@@ -269,6 +267,8 @@ public class ManejadorLogs {
 			FindIterable<Document> ultimo =   col.find().limit(1);
 			for (Document docIte : ultimo) {
 				resultado = new InfoCpu();
+				String fechaAPoner = UtilFormato.mongoTimeToDate(docIte.getString("Time"));
+				resultado.setFecha(fechaAPoner);
 				resultado.setCpuLoad(Double.parseDouble(docIte.getString("CPULoad")));
 				resultado.setNumeroCpus(Integer.parseInt(docIte.getString("NumberOfCPUs")));
 			}
@@ -307,6 +307,11 @@ public class ManejadorLogs {
 				List<Document> detalles = (List<Document>) docIte.get("DiskArray");
 				for (Document detalle : detalles) {
 					InfoDisco info = new InfoDisco();
+					//Tratamiento de fecha
+					String fechaAPoner = UtilFormato.mongoTimeToDate(docIte.getString("Time"));
+
+					
+					info.setFecha(fechaAPoner);
 					info.setMount(detalle.getString("mount"));
 					String espacioDispo = detalle.getString("spaceavail");
 					String espacioTotal = detalle.getString("spacetotal");
@@ -370,7 +375,7 @@ public class ManejadorLogs {
 	}
 	
 	@SuppressWarnings({ "unchecked", "resource" })
-	public List<LogAgente> getAgenteUsuarioPorFecha(String nodo, String fecha) {
+	public List<LogAgente> getAgenteUsuarioPorFecha(String nodo, String fechaInicio, String fechaFin) {
 
 		MongoClient mongoClient = null;
 		List<LogAgente> ret = new ArrayList<LogAgente>();
@@ -381,16 +386,22 @@ public class ManejadorLogs {
 		MongoDatabase database = mongoClient.getDatabase("logtek");
 		MongoCollection<Document> col = database.getCollection("syslog");
 		
-		List<Document> ue = (List<Document>) col.find().limit(50).into(new ArrayList<Document>());
+		List<Document> ue = (List<Document>) col.find().into(new ArrayList<Document>());
 		for (Document docIte : ue) {
-			//System.out.println("nodeinfo: " + docIte);
-			try {
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-				Date fechaInicio = df.parse(fecha);
-				Date reported = df.parse(docIte.getString("timereported"));
-				System.out.println("+++++++++++++++++++++++++++++++++++++ " + fechaInicio + " : " + reported);
-				if(docIte.getString("source").equals(nodo) /*&& fechaInicio.before(reported)*/) {
-					//String mensaje = docIte.getString("msg");
+			try {			
+				
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+				LocalDate dateInicio = LocalDate.parse(fechaInicio, formatter);
+				
+				LocalDate dateActual = LocalDate.parse(docIte.getString("timereported").split("T")[0], formatter);
+				
+				LocalDate dateFin = LocalDate.parse(fechaFin, formatter);
+				
+				//Date dateInicio = new Date(fechaInicio);
+				//Date dateActual = new Date(docIte.getString("timereported").split("T")[0]);
+				//Date dateFin = new Date(fechaFin);
+				System.out.println("cond1: " + dateInicio.isBefore(dateActual) + "cond2: " + dateFin.isAfter(dateActual) + "cond3: " + dateActual.equals(dateInicio) + "cond4: " + dateActual.equals(dateFin));
+				if(docIte.getString("source").equals(nodo) && ((dateInicio.isBefore(dateActual) && dateFin.isAfter(dateActual)) || (dateActual.equals(dateInicio) || dateActual.equals(dateFin)))) {
 										
 					LogAgente agente = new LogAgente();
 					agente.setFromHost(docIte.getString("fromhost"));
@@ -398,17 +409,18 @@ public class ManejadorLogs {
 					agente.setProgramName(docIte.getString("programname"));
 					agente.setSysLogSeverityText(docIte.getString("syslogseverity-text"));
 					agente.setTimeReported(docIte.getString("timereported"));
-										
-					//agente.setIp(mensaje.split("-")[0]);
-					//agente.setDate((mensaje.substring(mensaje.indexOf("["), mensaje.indexOf("]")))); 
+					agente.setRawMessage(docIte.getString("rawmsg"));					
+					
 					ret.add(agente);
 				}
+
 			}
 			catch(Exception e){
 				
 			}
 
 		}
+		System.out.println(ret.size());
 		mongoClient.close();
 		return ret;
 	}

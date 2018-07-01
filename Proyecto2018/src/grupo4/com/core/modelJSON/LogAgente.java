@@ -7,6 +7,7 @@ public class LogAgente {
 	private String fromHostIp;
 	private String programName;
 	private String sysLogSeverityText;
+	private String rawMessage;
 	
 	public String getTimeReported() {
 		return timeReported;
@@ -23,6 +24,9 @@ public class LogAgente {
 	public String getFromHostIp() {
 		return fromHostIp;
 	}
+	public String getRawMessage() {
+		return rawMessage;
+	}
 	public void setFromHostIp(String fromHostIp) {
 		this.fromHostIp = fromHostIp;
 	}
@@ -37,5 +41,8 @@ public class LogAgente {
 	}
 	public void setSysLogSeverityText(String sysLogSeverityText) {
 		this.sysLogSeverityText = sysLogSeverityText;
+	}
+	public void setRawMessage(String rawMessage) {
+		this.rawMessage = rawMessage;
 	}
 }

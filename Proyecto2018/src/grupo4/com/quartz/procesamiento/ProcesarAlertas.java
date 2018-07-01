@@ -245,18 +245,13 @@ public class ProcesarAlertas {
 		for (int us = 0; us < usuariosANotificar.size(); us++) {
 			Usuario aNoti = usuariosANotificar.get(us);
 			if (nivel == Constantes.MAIL) { // Mail
-				
-				//Email.enviarMail(aNoti.getUsername(), aNoti.getMail(), cuerpoMail);
-				// notificacionRealTimeAleman
+				Email.enviarMail(aNoti.getUsername(), aNoti.getMail(), cuerpoMail);
 			} else if (nivel == Constantes.MAIL_Y_SMS) { // Mail y sms
-				//Email.enviarMail(aNoti.getUsername(), aNoti.getMail(), cuerpoMail);
-				//Sms.enviarSms(aNoti.getUsername(), aNoti.getMail());
-				// notificacionRealTimeAleman
+				Email.enviarMail(aNoti.getUsername(), aNoti.getMail(), cuerpoMail);
+				Sms.enviarSms(aNoti.getUsername(), aNoti.getMail());
 			} else if (nivel == Constantes.SMS) { // Solo SMS
-				//Sms.enviarSms(aNoti.getUsername(), aNoti.getMail());
-				// notificacionRealTimeAleman
+				Sms.enviarSms(aNoti.getUsername(), aNoti.getMail());
 			} else {// Solo pantalla
-				// notificacionRealTimeAleman();
 			}
 			usuariosNotificados.add(aNoti);
 		}
