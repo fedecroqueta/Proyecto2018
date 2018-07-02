@@ -17,6 +17,7 @@ import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
 
 import grupo4.com.quartz.jbos.JobsAlertasEventosGlobales;
+import grupo4.com.quartz.jbos.JobsEliminarEventosGlobalesInactivos;
 import grupo4.com.util.Log;
 
 @SuppressWarnings("unused")
@@ -43,12 +44,14 @@ public class Schedule extends HttpServlet implements ServletContextListener {
 					.withSchedule(CronScheduleBuilder.cronSchedule("0/59 0/1 * 1/1 * ? *")).build();
 			
 			//Demonio cada 1 dia para borrar eventos inactivos por mas de 50 dias
-			//JobDetail jobEliminarInactivos = JobBuilder.newJob(JobsEliminarEventosGlobalesInactivos.class).withIdentity("DemonioBorrarInactivos", "BorrarInactivos").build();
+			JobDetail jobEliminarInactivos = JobBuilder.newJob(JobsEliminarEventosGlobalesInactivos.class).withIdentity("DemonioBorrarInactivos", "BorrarInactivos").build();
 			
-			/*Trigger triggerEliminar = TriggerBuilder.newTrigger().withIdentity("triggerDemonioEliminar",  "BorrarInactivos")
-					.withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 1/1 * ? *")).build();*/
+			Trigger triggerEliminar = TriggerBuilder.newTrigger().withIdentity("triggerDemonioEliminar",  "BorrarInactivos")
+					//.withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 1/1 * ? *")).build();
+					.withSchedule(CronScheduleBuilder.cronSchedule("0/59 0/1 * 1/1 * ? *")).build();
 			
 			scheduler.scheduleJob(job, trigger);
+			scheduler.scheduleJob(jobEliminarInactivos,triggerEliminar );
 			
 			log.log("Se agenda job:[JobAlertasEventosGlobales]");
 		} catch (Throwable t) {

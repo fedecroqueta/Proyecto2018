@@ -11,6 +11,7 @@ import org.quartz.JobExecutionException;
 import grupo4.com.alertas.Email;
 import grupo4.com.quartz.ControlarProcesamiento;
 import grupo4.com.quartz.procesamiento.ProcesarAlertas;
+import grupo4.com.quartz.procesamiento.ProcesarEliminacionInactivos;
 import grupo4.com.util.Log;
 
 public class JobsEliminarEventosGlobalesInactivos implements Job {
@@ -42,8 +43,8 @@ public class JobsEliminarEventosGlobalesInactivos implements Job {
 			log.log("Inicia ejecucion [JobsEliminarEventosGlobalesInactivos]...");
 			ControlarProcesamiento.getInstance().comienzaProcesamiento();
 			long ini = System.currentTimeMillis();
-			/*ProcesarAlertas procesarAlertas = new ProcesarAlertas();
-			procesarAlertas.ejecutarProcesoAlertas(log);*/
+			ProcesarEliminacionInactivos procesareventosInactivos = new ProcesarEliminacionInactivos();
+			procesareventosInactivos.ejecutarProcesoAlertas(log);
 			long fin = System.currentTimeMillis();
 			long demora = fin - ini;
 			log.log("Finaliza ejecucion [JobsEliminarEventosGlobalesInactivos]. Demora ["+demora+"]");

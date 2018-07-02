@@ -9,12 +9,14 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import grupo4.com.util.Log;
+
 public class Email {
 
 	public static JsonNode enviarMail(String username, String mail, String cuerpoMail) throws UnirestException {
 		Properties prop = new Properties();
 		InputStream input = null;
-		
+		Log log = new Log("EnvioMails.log", true);
 		//Cargo archivo properties para cargar parametros de mailgun
 		try {
 			//input = new FileInputStream("config\\configuracion.properties");
@@ -32,7 +34,8 @@ public class Email {
 				.queryString("from", "Logtek Staff <" + prop.getProperty("USER_DOMAIN") + ">")
 				.queryString("to", "Querido " + username + ", " + mail)
 				.queryString("subject", "Alerta se dispara evento").queryString("text", cuerpoMail).asJson();
-
+		
+		log.log("Se envia mail para ["+mail+"] , mensaje["+cuerpoMail+"]");
 		return request.getBody();
 	}
 }

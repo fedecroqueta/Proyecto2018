@@ -900,6 +900,74 @@ public class BD {
 		}
 		return borrado;
 	}
+
+	public boolean elminarSusEventosInactivos(long idEvento, Log log) {
+		boolean borrado = false;
+		Connection c = null;
+		Statement st = null;
+		int  rs = 0;
+		String sql = null;
+		
+		try {
+			log.log("Se eliminas suscripciones de Evento GLOBAL INACTIVOS :["+idEvento+"]");
+			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
+			sql = "DELETE FROM suscripciones_eventos_globales WHERE id_evento_global = "+idEvento+";";
+			st = c.createStatement();
+			rs = st.executeUpdate(sql);
+			borrado = (rs > 0) ? true : false;
+			log.log("Suscripciones a Evento  ["+idEvento+"] ELIMINADAS CON EXITO POR INACTIVIDAD ");
+		} catch(Throwable t) {
+			log.log("No es posible eliminar suscripciones de EVENTO GLOBAL POR INACTIVIDAD["+idEvento+"] Error:["+t.getMessage()+"].SQL ["+sql+"]", t);
+		} finally {
+			UtilBase.cerrarComponentes(null, null, st, c);
+		}
+		return borrado;
+	}
+
+	public String recuperarMailUsuarioCreador(String usuarioCreador, Log log) {
+		String mailUsuarioCreador = "";
+		Connection c = null;
+		Statement st = null;
+		ResultSet  rs = null;
+		String sql = "";
+		try {
+			log.log("Se recupera mail del usuario creador["+usuarioCreador+"] del evento global inactivo para avisar");
+			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
+			sql = 	"SELECT mail FROM usuarios WHERE usuarios.username='"+usuarioCreador+"' LIMIT 1";
+			st = c.createStatement();
+			rs = st.executeQuery(sql);
+			while(rs.next()) {
+				mailUsuarioCreador = rs.getString("mail");
+			}
+		} catch(Throwable t) {
+			log.log("No es posible recuperar mail del usuario debido a. Error:["+t.getMessage()+"].SQL ["+sql+"]", t);
+		} finally {
+			UtilBase.cerrarComponentes(null, rs, st, c);
+		}
+		return mailUsuarioCreador;
+	}
+
+	public void eliminarCabezalEventoGlobalInactivo(long idEvento, Log log) {
+		Connection c = null;
+		Statement st = null;
+		int  rs = 0;
+		String sql = null;
+		
+		try {
+			log.log("Se elimina cabezal de Evento GLOBAL INACTIVOS :["+idEvento+"]");
+			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
+			sql = "DELETE FROM eventos_globales WHERE id_evento = "+idEvento+";";
+			st = c.createStatement();
+			rs = st.executeUpdate(sql);
+			boolean borrado = (rs > 0) ? true : false;
+			if(borrado)
+				log.log("Cabezal de Evento  ["+idEvento+"] ELIMINADAS CON EXITO POR INACTIVIDAD ");
+		} catch(Throwable t) {
+			log.log("No es posible eliminar suscripciones de EVENTO GLOBAL POR INACTIVIDAD["+idEvento+"] Error:["+t.getMessage()+"].SQL ["+sql+"]", t);
+		} finally {
+			UtilBase.cerrarComponentes(null, null, st, c);
+		}
+	}
 	
 	
 }

@@ -12,6 +12,7 @@ import java.util.Locale;
 
 import org.bson.Document;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.FindIterable;
@@ -134,7 +135,7 @@ public class ManejadorLogs {
 			long epoch = System.currentTimeMillis()/1000;
 			
 			//Filta por fecha mayor o igual y menor o igual a la que llega por paramtero
-			FindIterable<Document> lista = col.find(Filters.and(Filters.gte("Time", String.valueOf(fechaDesdeEpoch)), Filters.lte("Time",  String.valueOf(fechaHastaEpoch))));
+			FindIterable<Document> lista = col.find(Filters.and(Filters.gte("Time", String.valueOf(fechaDesdeEpoch)), Filters.lte("Time",  String.valueOf(fechaHastaEpoch)))).sort(new BasicDBObject("Time", 1));
 			
 			int tamaLista = 0;
 			int auxRes =0;
@@ -231,7 +232,7 @@ public class ManejadorLogs {
 			//FindIterable<Document> lista = col.find(Filters.gte("Time", String.valueOf(fechaDesdeEpoch)));
 
 			//Filta por fecha mayor o igual y menor o igual a la que llega por paramtero
-			FindIterable<Document> lista = col.find(Filters.and(Filters.gte("Time", String.valueOf(fechaDesdeEpoch)), Filters.lte("Time",  String.valueOf(fechaHastaEpoch))));
+			FindIterable<Document> lista = col.find(Filters.and(Filters.gte("Time", String.valueOf(fechaDesdeEpoch)), Filters.lte("Time",  String.valueOf(fechaHastaEpoch)))).sort(new BasicDBObject("Time", 1));
 			
 			int tamaLista = 0;
 			for (Document docIte : lista) {
@@ -299,7 +300,7 @@ public class ManejadorLogs {
 			long epoch = System.currentTimeMillis()/1000;
 			
 			//Filta por fecha mayor o igual y menor o igual a la que llega por paramtero
-			FindIterable<Document> lista = col.find(Filters.and(Filters.gte("Time", String.valueOf(fechaDesdeEpoch)), Filters.lte("Time",  String.valueOf(fechaHastaEpoch))));
+			FindIterable<Document> lista = col.find(Filters.and(Filters.gte("Time", String.valueOf(fechaDesdeEpoch)), Filters.lte("Time",  String.valueOf(fechaHastaEpoch)))).sort(new BasicDBObject("Time", 1));
 			
 			int tamaLista = 0;
 			for (Document docIte : lista) {

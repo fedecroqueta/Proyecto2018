@@ -50,7 +50,7 @@ public class ProcesarEliminacionInactivos {
 			
 
 			// Recupero suscripciones
-			suscripciones = base.getSuscripcionesEGActivas(log);
+			//suscripciones = base.getSuscripcionesEGActivas(log);
 
 			// Recupero lista de eventos inactivos
 			eventosInactivos = base.getListaEventosInactivos(log);
@@ -59,7 +59,7 @@ public class ProcesarEliminacionInactivos {
 			// configurado, se elimina todo
 			// y se avisa por Email al SA que lo creo
 			for (int i = 0; i < eventosInactivos.size(); i++) {
-				EventoGIdYFechaInactivo eventoInactivo = new EventoGIdYFechaInactivo();
+				EventoGIdYFechaInactivo eventoInactivo = eventosInactivos.get(i);
 				String fechaInactividad = eventoInactivo.getFechaInactividad();
 				
 				DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -67,15 +67,27 @@ public class ProcesarEliminacionInactivos {
 				Date  now = new Date();
 				//Comparo si la fecha que viene es mayor a la fecha configurada
 				if((now.getTime() - date.getTime() > TimeUnit.DAYS.toMillis(Long.parseLong(prop.getProperty("FECHA_MAX_INACTIVIDAD"))))){
+					
 					//eliminio cofiguraciones de ese evento
 					boolean elminioConf = base.eliminarConfEventosInactivos(eventoInactivo.getIdEvento(), log);
 					
-					//TODO:elimino suscripciones de ese evento
+					boolean eliminoSuscripciones = false;
+					if(elminioConf) {
+						//elimino suscripciones de ese evento
+						eliminoSuscripciones = base.elminarSusEventosInactivos(eventoInactivo.getIdEvento(), log);
+	
+					}
+					if(eliminoSuscripciones) {
+						//Recupero mail del usuario creador para avisar
+						String mailUsuarioCreador = base.recuperarMailUsuarioCreador(eventoInactivo.getUsuarioCreador(), log);
+						
+						//Mando  mail avisando al creador
+						String cuerpoMail = "Evento["+eventoInactivo.getIdEvento()+"]-["+eventoInactivo.getNombreEvento()+"]-ELIMINADO POR INACTIVIDAD MAYOR A ["+prop.getProperty("FECHA_MAX_INACTIVIDAD")+"] DIAS";
+						Email.enviarMail(eventoInactivo.getUsuarioCreador(),mailUsuarioCreador, cuerpoMail);
 					
-					//aviso al usuario creador del evento que se elimina por inactividad
-					//TODO:cambiar por recuperacion de mail
-					String cuerpoMail = "Evento["+eventoInactivo.getIdEvento()+"]-["+eventoInactivo.getNombreEvento()+"]-ELIMINADO POR INACTIVIDAD MAYOR A ["+prop.getProperty("FECHA_MAX_INACTIVIDAD")+"]";
-					Email.enviarMail(eventoInactivo.getUsuarioCreador(), "fedecroqueta@gmail.com", cuerpoMail);
+						//Por ultimo elimino el cabezal
+						base.eliminarCabezalEventoGlobalInactivo(eventoInactivo.getIdEvento(), log);
+					}
 				}
 			}
 			log.log("Finaliza procesamiento eliminacion de inactivos...");
