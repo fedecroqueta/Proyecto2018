@@ -968,6 +968,39 @@ public class BD {
 			UtilBase.cerrarComponentes(null, null, st, c);
 		}
 	}
+
+	public boolean verificarNotiEntregada(Log log, long idEvento, int tipo, String usuarioRecibe) {
+		boolean notiYaEntregada = false;
+		Connection c = null;
+		Statement st = null;
+		ResultSet  rs = null;
+		String sql = null;
+		try {
+			log.log("Se consulta si la notificacion debe ser enviada o ya fue procesada :["+idEvento+"]");
+			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String unaHoraAtras = sdf.format(new Date(System.currentTimeMillis() - (1 * 60 * 60 * 1000)));
+			sql = "SELECT id_noti "
+					+ " FROM notificaciones "
+					+ " WHERE id_evento_global = "+idEvento+" "
+					+ " AND fecha_dispara>'"+unaHoraAtras+"' "
+					+ " AND usuario_recibe='"+usuarioRecibe+"' AND entregada=true;";
+			st = c.createStatement();
+			rs = st.executeQuery(sql);
+			notiYaEntregada = (rs.next()) ? true : false;
+			if(notiYaEntregada) {
+				log.log("No se debe enviar notificacion de nuevo");
+				notiYaEntregada = true;
+			}else {
+				log.log("Se debe enviar notificacion");
+			}
+		} catch(Throwable t) {
+			log.log("No es posible verificar si se debe enviar notificacion de evento["+idEvento+"] Error:["+t.getMessage()+"].SQL ["+sql+"]", t);
+		} finally {
+			UtilBase.cerrarComponentes(null, rs, st, c);
+		}
+		return notiYaEntregada;
+	}
 	
 	
 }

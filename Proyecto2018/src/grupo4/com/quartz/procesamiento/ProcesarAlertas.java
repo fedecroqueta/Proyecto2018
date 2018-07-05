@@ -62,11 +62,6 @@ public class ProcesarAlertas {
 			// Recupero mapa de eventos y sus configuraciones
 			mapEventosConConfiguracion = base.getMapEventosYConf(log);
 
-			// Hasta aca tengo toda la informacion que preciso para manejar las alertas
-			// despues seria algo como consultar por la alerta y tipo, matchear con
-			// informacion relevante de los nodos
-			// si valor a revisar supera a alerta veo el nivel y veo si mandar sms o mail o
-			// ambas o notificaicon en pantalla o todas
 
 			// Para cada evento
 			for (Map.Entry<Long, EventoGConf> evento : mapEventosConConfiguracion.entrySet()) {
@@ -122,20 +117,20 @@ public class ProcesarAlertas {
 								String cuerpoMailConEspacios = "Se dispara evento "+idEvento+" debido a Memoria RAM mayor de "+valor+" para el nodo "+n;
 								String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 								if (info.getFreeMemory() > valor) {
-									usuariosNotificados= controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+									usuariosNotificados= controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo, idEvento);
 								}
 							}	
 						} else if (tipo == Constantes.CPU) {
 							String cuerpoMailConEspacios = "Se dispara evento ["+idEvento+"] debido a CPU mayor de "+valor+" para el nodo "+n;
 							String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 							if (info.getCpuLoad() > valor) {
-								usuariosNotificados = controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+								usuariosNotificados = controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo, idEvento);
 							}
 						} else if (tipo == Constantes.DISCO) {
 							String cuerpoMailConEspacios = "Se dispara evento "+idEvento+" debido a DISCO mayor de "+valor+" para el nodo "+n;
 							String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 							if (info.getFreeDisk() > valor) {
-								usuariosNotificados = controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+								usuariosNotificados = controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo , idEvento);
 							}
 						}
 						
@@ -152,19 +147,19 @@ public class ProcesarAlertas {
 							String cuerpoMailConEspacios = "Se dispara evento "+idEvento+" debido a Memoria RAM menor de "+valor+" para el nodo "+n;
 							String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 							if (info.getFreeMemory() < valor) {
-								usuariosNotificados= controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+								usuariosNotificados= controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo, idEvento);
 							}
 						} else if (tipo == Constantes.CPU) {
 							String cuerpoMailConEspacios = "Se dispara evento "+idEvento+" debido a CPU menor de "+valor+" para el nodo "+n;
 							String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 							if (info.getCpuLoad() < valor) {
-								usuariosNotificados = controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+								usuariosNotificados = controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo, idEvento);
 							}
 						} else if (tipo == Constantes.DISCO) {
 							String cuerpoMailConEspacios = "Se dispara evento "+idEvento+" debido a DISCO menor de "+valor+" para el nodo "+n;
 							String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 							if (info.getFreeDisk() < valor) {
-								usuariosNotificados = controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+								usuariosNotificados = controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo, idEvento);
 							}
 						}
 						
@@ -180,19 +175,19 @@ public class ProcesarAlertas {
 							String cuerpoMailConEspacios = "Se dispara evento "+idEvento+" debido a RAM igual de "+valor+" para el nodo "+n;
 							String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 							if (info.getFreeMemory() == valor) {
-								usuariosNotificados = controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+								usuariosNotificados = controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo, idEvento);
 							}
 						} else if (tipo == Constantes.CPU) {
 							String cuerpoMailConEspacios = "Se dispara evento "+idEvento+" debido a CPU igual de "+valor+" para el nodo "+n;
 							String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 							if (info.getCpuLoad() == valor) {
-								usuariosNotificados = controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+								usuariosNotificados = controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo, idEvento);
 							}
 						} else if (tipo == Constantes.DISCO) {
 							String cuerpoMailConEspacios = "Se dispara evento "+idEvento+" debido a DISCO igual de "+valor+" para el nodo "+n;
 							String cuerpoMail = UtilFormato.remplazarEspacios(cuerpoMailConEspacios);
 							if (info.getFreeDisk() == valor) {
-								usuariosNotificados = controlNotificacion(nivel, cuerpoMailConEspacios, usuariosANotificar);
+								usuariosNotificados = controlNotificacion(log, nivel, cuerpoMailConEspacios, usuariosANotificar, tipo, idEvento);
 							}
 						}
 						
@@ -240,22 +235,35 @@ public class ProcesarAlertas {
 	/**
 	 * Controla que tipo de notificacion mandar y es la encargada de llamar a los manejadores que envien dicha notificacion
 	 */
-	private List<Usuario> controlNotificacion (int nivel, String cuerpoMail, List<Usuario> usuariosANotificar) throws Exception {
+	private List<Usuario> controlNotificacion (Log log, int nivel, String cuerpoMail, List<Usuario> usuariosANotificar, int tipo, long idEvento) throws Exception {
 		List<Usuario> usuariosNotificados = new ArrayList<Usuario>();
 		for (int us = 0; us < usuariosANotificar.size(); us++) {
 			Usuario aNoti = usuariosANotificar.get(us);
-			if (nivel == Constantes.MAIL) { // Mail
+			boolean notiYaFueEntregada = notiYaEntregada(log, idEvento,  tipo, aNoti.getUsername());
+			if (nivel == Constantes.MAIL && !notiYaFueEntregada) { // Mail
 				Email.enviarMail(aNoti.getUsername(), aNoti.getMail(), cuerpoMail);
-			} else if (nivel == Constantes.MAIL_Y_SMS) { // Mail y sms
+			} else if (nivel == Constantes.MAIL_Y_SMS && !notiYaFueEntregada ) { // Mail y sms
 				Email.enviarMail(aNoti.getUsername(), aNoti.getMail(), cuerpoMail);
-				Sms.enviarSms(aNoti.getUsername(), aNoti.getMail());
-			} else if (nivel == Constantes.SMS) { // Solo SMS
-				Sms.enviarSms(aNoti.getUsername(), aNoti.getMail());
+				Sms.enviarSms(aNoti.getNumero_cel(), cuerpoMail.replaceAll("\\s+", "%20"));
+			} else if (nivel == Constantes.SMS && !notiYaFueEntregada ) { // Solo SMS
+				Sms.enviarSms(aNoti.getNumero_cel(), cuerpoMail);
 			} else {// Solo pantalla
 			}
 			usuariosNotificados.add(aNoti);
 		}
 		return usuariosNotificados;
+	}
+	
+	private boolean notiYaEntregada (Log log, long idEvento, int tipo, String usuarioRecibe) {
+		boolean notiYaEntregada = false;
+		try {
+			BD base =  new BD();
+			notiYaEntregada = base.verificarNotiEntregada(log, idEvento, tipo, usuarioRecibe);
+		}catch(Throwable t) {
+			log.log("ERROR no es posible verificar si la notificacion ya fue enviada! debido a ["+t.getMessage()+"]");
+		}
+		return notiYaEntregada;
+		
 	}
 	
 }

@@ -43,7 +43,6 @@ public class Sms {
 		boolean enviado = false;
 		String host 	= "localhost";
 		Sms t = new Sms(host);
-		
 		String url = "http://"+host+":8080/TwilioSms/rest/endpointSms/sms/"+numero+"/"+cuerpoSms;
 		t.procesarPOST(null, url);
 		
