@@ -398,11 +398,9 @@ public class ManejadorLogs {
 				
 				LocalDate dateFin = LocalDate.parse(fechaFin, formatter);
 				
-				//Date dateInicio = new Date(fechaInicio);
-				//Date dateActual = new Date(docIte.getString("timereported").split("T")[0]);
-				//Date dateFin = new Date(fechaFin);
+
 				System.out.println("cond1: " + dateInicio.isBefore(dateActual) + "cond2: " + dateFin.isAfter(dateActual) + "cond3: " + dateActual.equals(dateInicio) + "cond4: " + dateActual.equals(dateFin));
-				if(docIte.getString("source").equals(nodo) && ((dateInicio.isBefore(dateActual) && dateFin.isAfter(dateActual)) || (dateActual.equals(dateInicio) || dateActual.equals(dateFin)))) {
+				if( docIte.getString("source").equals(nodo) && ((dateInicio.isBefore(dateActual) && dateFin.isAfter(dateActual)) || (dateActual.equals(dateInicio) || dateActual.equals(dateFin)))) {
 										
 					LogAgente agente = new LogAgente();
 					agente.setFromHost(docIte.getString("fromhost"));

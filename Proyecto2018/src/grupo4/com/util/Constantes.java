@@ -28,7 +28,7 @@ public class Constantes {
 	public static final int MAIL_Y_SMS						=	3;
 	
 	//Nodos pre definidos
-	public static final List<String> nodos					= Arrays.asList("node1", "node2", "node3");
+	public static final List<String> nodosPruebaNombres					= Arrays.asList("Servidor Central", "App Montevideo", "Servidor Secundario");
 	
 
 }

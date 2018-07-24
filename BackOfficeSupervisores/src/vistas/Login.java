@@ -28,7 +28,7 @@ public class Login extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static void main(String[] args) {
-		frame = new JFrame("LogTek Grupo4©");
+		frame = new JFrame("Smart Alert Staff");
 		JPanel panel = new JPanel();
 		frame.setSize(300, 150);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

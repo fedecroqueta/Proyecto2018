@@ -45,7 +45,7 @@ public class ManejadorInfra {
 			MongoDatabase database = mongoClient.getDatabase("logtek");
 			MongoIterable <String> nombres = database.listCollectionNames();
             for (String nombreColeccion: nombres) {
-            	if(nombreColeccion != null && !nombreColeccion.equals("system.indexes")) {
+            	if(nombreColeccion != null && !nombreColeccion.equals("system.indexes") && !nombreColeccion.equals("logtek") && !nombreColeccion.equals("syslog")) {
             		colecciones.add(nombreColeccion);
             	}
             }

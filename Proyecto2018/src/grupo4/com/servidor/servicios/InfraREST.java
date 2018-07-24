@@ -47,6 +47,7 @@ public class InfraREST {
 		try {
 			log = new Log("InfraREST.log", true);
 			log.log("-> [Recuperando lista de nodos .");
+			//listaNodos = Constantes.nodosPruebaNombres;
 			listaNodos = minfra.getColeccionesAsignadas(log);
 			return Response.ok(listaNodos).build();
 		} catch (Throwable t) {
