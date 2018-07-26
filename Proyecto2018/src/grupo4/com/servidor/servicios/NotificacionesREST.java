@@ -59,10 +59,32 @@ public class NotificacionesREST {
 			log = new Log("NotificacionesREST.log", true);
 			log.log("Comienza recuperacion de todas las notificacones ]");
 			String usuario = MetodosToken.getUsuario(log, token);
-			notificaciones = mnotis.getMisNotis(log, usuario);
+			notificaciones = mnotis.getMisNotis(log, usuario, false);
 			return Response.ok(notificaciones).build();	
 		} catch (Throwable t) {
 			log.log("Error recuperando lista de  notificaciones debido a["+t.getMessage()+"]", t);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		} finally {
+			log.log("Termina recuperacion  de notificacionesL :[" + notificaciones.toString() + "]");
+			Log.cerrar(log);
+		}
+	}
+	
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/testNotisAngular")
+	public Response testNotisAngular() {
+		Log log = null;
+		List<Notis> notificaciones = new ArrayList<Notis>();
+		try {
+			log = new Log("NotificacionesREST.log", true);
+			log.log("Comienza recuperacion de todas las notificacones para angular ]");
+			
+			notificaciones = mnotis.getNotisParaFront(log);
+			return Response.ok(notificaciones).build();	
+		} catch (Throwable t) {
+			log.log("Error recuperando lista de  notificaciones para angular debido a["+t.getMessage()+"]", t);
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		} finally {
 			log.log("Termina recuperacion  de notificacionesL :[" + notificaciones.toString() + "]");

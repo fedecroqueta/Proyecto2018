@@ -817,7 +817,7 @@ public class BD {
 		return notis;
 	}
 
-	public List<Notis> getMisNotis(Log log, String usuario) {
+	public List<Notis> getMisNotis(Log log, String usuario, boolean todos) {
 		String sql		= "";
 		List<Notis> notis = null;
 		Connection c 	= null;
@@ -827,7 +827,11 @@ public class BD {
 			log.log("Recuperando lista de notificaiones para el usuario ["+usuario+"] en BD....");
 			notis = new ArrayList<Notis>();
 			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
-			sql = "SELECT * FROM notificaciones WHERE usuario_recibe = '"+usuario+"'";
+			if(todos) {
+				sql = "SELECT * FROM notificaciones WHERE entregada = true ";
+			}else {
+				sql = "SELECT * FROM notificaciones WHERE usuario_recibe = '"+usuario+"' ";
+			}
 			st = c.createStatement();
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
@@ -1000,6 +1004,45 @@ public class BD {
 			UtilBase.cerrarComponentes(null, rs, st, c);
 		}
 		return notiYaEntregada;
+	}
+
+	public List<Notis> getNotisParaFront(Log log) {
+		String sql		= "";
+		String update 	= "";
+		List<Notis> notis = null;
+		Connection c 	= null;
+		Statement st 	= null;
+		ResultSet rs	= null;
+		try {
+			log.log("Recuperando lista de notificaiones para Angular en BD....");
+			notis = new ArrayList<Notis>();
+			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
+			sql = "SELECT * FROM notificaciones WHERE entregada_angular IS NULL ";
+			st = c.createStatement();
+			rs = st.executeQuery(sql);
+			while (rs.next()) {
+				Notis noti = new Notis();
+				noti.setId_noti(rs.getLong("id_noti"));
+				noti.setCondicion_dispara(rs.getString("condicion_dispara"));
+				noti.setEntregada(rs.getBoolean("entregada"));
+				noti.setFecha_dispara(rs.getString("fecha_dispara"));
+				noti.setId_evento_global(rs.getLong("id_evento_global"));
+				noti.setTipo(rs.getShort("tipo"));
+				noti.setUsuario_recibe(rs.getString("usuario_recibe"));
+				noti.setEntregada_angular(rs.getBoolean("entregada_angular"));
+				notis.add(noti);
+			}
+			 update = "UPDATE notificaciones SET entregada_angular=true WHERE entregada_angular IS NULL";
+			 int up = 0;
+			 up = st.executeUpdate(update);
+			 String stLog = (up>0) ? "SE UPDATEARON BIEN" : "NO CORRESPONDE ACTUALIZAR";
+			 log.log(stLog);
+		}catch(Throwable t) {
+			log.log("No fue posible recuperar lista de notificaciones en BD. SQL ["+sql+"]. debido a ["+t.getMessage()+"]");
+		}finally {
+			UtilBase.cerrarComponentes(null, rs, st, c);
+		}
+		return notis;
 	}
 	
 	

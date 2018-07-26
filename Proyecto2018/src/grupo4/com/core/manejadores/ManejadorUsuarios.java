@@ -1,5 +1,8 @@
 package grupo4.com.core.manejadores;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import grupo4.com.core.modelJEE.Usuario;
 import grupo4.com.servidor.database.BD;
 import grupo4.com.util.Log;
@@ -49,6 +52,17 @@ public class ManejadorUsuarios {
 			log.log("-->ERROR");
 		}
 		return usuario;
+	}
+
+	public List<Usuario> listarUsuarios(Log log) {
+		List<Usuario> listaUsuarios = new ArrayList<Usuario>();
+		try {
+			BD base = new BD();
+			listaUsuarios = base.getUsuariosActivos(log);
+		}catch(Throwable t ) {
+			log.log("-->ERROR ["+t.getMessage()+"]", t);
+		}
+		return listaUsuarios;
 	}
 
 }

@@ -20,11 +20,22 @@ public class ManejadorNotificaciones {
 		return notisTodas;
 	}
 
-	public List<Notis> getMisNotis(Log log, String usuario) {
+	public List<Notis> getNotisParaFront(Log log) {
+		List<Notis> notisSoloFront = new ArrayList<Notis>();
+		try {
+			BD base = new BD();
+			notisSoloFront =  base.getNotisParaFront(log);
+		}catch(Throwable t) {
+			log.log("-->ERROR");
+		}
+		return notisSoloFront;
+	}
+	
+	public List<Notis> getMisNotis(Log log, String usuario, boolean todos) {
 		List<Notis> notisSoloMias = new ArrayList<Notis>();
 		try {
 			BD base = new BD();
-			notisSoloMias =  base.getMisNotis(log, usuario);
+			notisSoloMias =  base.getMisNotis(log, usuario, todos);
 		}catch(Throwable t) {
 			log.log("-->ERROR");
 		}

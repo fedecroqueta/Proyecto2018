@@ -24,7 +24,7 @@ public class LogsEndpoint {
 	@OnOpen
 	public void connect(Session session) throws IOException {
 		this.session = session;
-		sendMessage("Echo: ");
+		sendMessage("Disfruta de SmartAlert!");
 	}
 
 	@OnClose
@@ -36,22 +36,13 @@ public class LogsEndpoint {
 	public void onMessage(String msg) throws IOException, InterruptedException {		
 		
 		Thread.sleep(5000);
-		
-		Log log = new Log("adsads.log", true);
-		List<Notis> notis = mnotis.getMisNotis(log, "fede");
-		//notis = new ArrayList<Notis>();
-		
-		sendMessage(manejoNotifiacionesTemporal(notis));
-		
-		/*		
-		if(!notis.isEmpty()) {
-			sendMessage(notis.get(1).getCondicion_dispara());
+		Log log = new Log("WebSocket.log", true);
+		//List<Notis> notis = mnotis.getMisNotis(log, "" , true);
+		List<Notis> notis = mnotis.getNotisParaFront(log);
+		if(notis != null) {
+			sendMessage(manejoNotifiacionesTemporal(notis));
 		}
-		else {
-			sendMessage("");
-		}
-		*/
-		//this.session.getAsyncRemote().sendText("Echo: " + msg);
+		
 	}
 	
 	public void sendMessage(String message) throws IOException {

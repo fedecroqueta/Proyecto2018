@@ -9,6 +9,7 @@ public class Notis {
 	private String condicion_dispara;
 	private boolean entregada;
 	private String usuario_recibe;
+	private boolean entregada_angular;
 	
 	public Notis() {
 		super();
@@ -60,6 +61,16 @@ public class Notis {
 	}
 	public void setUsuario_recibe(String usuario_recibe) {
 		this.usuario_recibe = usuario_recibe;
+	}
+
+
+	public boolean isEntregada_angular() {
+		return entregada_angular;
+	}
+
+
+	public void setEntregada_angular(boolean entregada_angular) {
+		this.entregada_angular = entregada_angular;
 	}
 	
 	

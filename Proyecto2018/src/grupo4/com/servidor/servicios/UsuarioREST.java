@@ -69,6 +69,34 @@ public class UsuarioREST {
 		}
 	}
 	
+	
+	@Secured
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/listarUsuarios")
+	public Response listarUsuarios(@HeaderParam(Constantes.HEADER_TOKEN) String token) {
+		Log log = null;
+		List<Usuario> listaUsuarios = null;
+		try {
+			log = new Log("UsuarioREST.log", true);
+			log.log("-> [Comienza obtencion de lista de usuarios");
+			String rol = MetodosToken.getRol(log, token);
+			String adminAlta = MetodosToken.getUsuario(log, token);
+			if(rol.equals(Constantes.ADMINISTRADOR_COMUN)||rol.equals(Constantes.ADMINISTRADOR_PRIVILEGIOS)||rol.equals(Constantes.ADMINISTRADOR_SOLO_NODOS) ||rol.equals(Constantes.SUPERVISOR) ) {
+				listaUsuarios = musu.listarUsuarios(log);
+				return Response.ok(listaUsuarios).build();	
+			}else {
+				return Response.ok("No tienes suficiente nivel de acceso para listar usuarios").build();	
+			}
+		} catch (Throwable t) {
+			log.log("Error listando usuarios debido a["+t.getMessage()+"]", t);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		} finally {
+			log.log("Termina obtencion  de usuarios");
+			Log.cerrar(log);
+		}
+	}
+	
 	@Secured
 	@PUT
 	@Produces(MediaType.APPLICATION_JSON)
