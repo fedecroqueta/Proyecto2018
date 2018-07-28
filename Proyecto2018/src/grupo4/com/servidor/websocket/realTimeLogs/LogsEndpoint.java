@@ -54,7 +54,7 @@ public class LogsEndpoint {
 		for(Notis n : notificaciones) {
 			if(!notificacionesRepetidasTemp.contains(n.getCondicion_dispara())) {
 				notificacionesRepetidasTemp.add(n.getCondicion_dispara());
-				return n.getCondicion_dispara();
+				return "Se dispara Evento [ ram baja] Debido a ["+n.getCondicion_dispara()+"]"+n.getFecha_dispara();
 			}
 		}
 		return "";
