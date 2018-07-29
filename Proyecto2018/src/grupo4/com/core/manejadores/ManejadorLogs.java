@@ -399,7 +399,7 @@ public class ManejadorLogs {
 				LocalDate dateFin = LocalDate.parse(fechaFin, formatter);
 				
 
-				System.out.println("cond1: " + dateInicio.isBefore(dateActual) + "cond2: " + dateFin.isAfter(dateActual) + "cond3: " + dateActual.equals(dateInicio) + "cond4: " + dateActual.equals(dateFin));
+				//System.out.println("cond1: " + dateInicio.isBefore(dateActual) + "cond2: " + dateFin.isAfter(dateActual) + "cond3: " + dateActual.equals(dateInicio) + "cond4: " + dateActual.equals(dateFin));
 				if( docIte.getString("source").equals(nodo) && ((dateInicio.isBefore(dateActual) && dateFin.isAfter(dateActual)) || (dateActual.equals(dateInicio) || dateActual.equals(dateFin)))) {
 										
 					LogAgente agente = new LogAgente();
@@ -416,6 +416,48 @@ public class ManejadorLogs {
 			}
 			catch(Exception e){
 				
+			}
+
+		}
+		System.out.println(ret.size());
+		mongoClient.close();
+		return ret;
+	}
+
+	public List<LogAgente> getAgenteUsuarioPorFechaMapa(String nodo, String fechaInicio, String fechaFin) {
+		MongoClient mongoClient = null;
+		List<LogAgente> ret = new ArrayList<LogAgente>();
+		String con = UtilMongo.ConMongoLogtek();
+		MongoClientURI connectionString = new MongoClientURI(con);
+		mongoClient = new MongoClient(connectionString);
+		MongoDatabase database = mongoClient.getDatabase("logtek");
+		MongoCollection<Document> col = database.getCollection("syslog");
+		
+		List<Document> ue = (List<Document>) col.find(Filters.and(Filters.ne("fromhost-ip", "127.0.0.1"), Filters.ne("fromhost-ip", "10.211.55.103"), Filters.ne("fromhost-ip", "10.211.55.101"), Filters.ne("fromhost-ip", "10.211.55.102") )).into(new ArrayList<Document>());
+		for (Document docIte : ue) {
+			try {			
+				
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+				LocalDate dateInicio = LocalDate.parse(fechaInicio, formatter);
+				LocalDate dateActual = LocalDate.parse(docIte.getString("timereported").split("T")[0], formatter);
+				LocalDate dateFin = LocalDate.parse(fechaFin, formatter);
+				
+				if( docIte.getString("source").equals(nodo) && ((dateInicio.isBefore(dateActual) && dateFin.isAfter(dateActual)) || (dateActual.equals(dateInicio) || dateActual.equals(dateFin)))) {
+										
+					LogAgente agente = new LogAgente();
+					agente.setFromHost(docIte.getString("fromhost"));
+					agente.setFromHostIp(docIte.getString("fromhost-ip"));
+					agente.setProgramName(docIte.getString("programname"));
+					agente.setSysLogSeverityText(docIte.getString("syslogseverity-text"));
+					agente.setTimeReported(docIte.getString("timereported"));
+					agente.setRawMessage(docIte.getString("rawmsg"));					
+					
+					ret.add(agente);
+				}
+
+			}
+			catch(Exception e){
+				System.out.println("ALE CHUPA VERGA");
 			}
 
 		}

@@ -10,6 +10,7 @@ public class Notis {
 	private boolean entregada;
 	private String usuario_recibe;
 	private boolean entregada_angular;
+	private String nombre_evento;
 	
 	public Notis() {
 		super();
@@ -71,6 +72,16 @@ public class Notis {
 
 	public void setEntregada_angular(boolean entregada_angular) {
 		this.entregada_angular = entregada_angular;
+	}
+
+
+	public String getNombre_evento() {
+		return nombre_evento;
+	}
+
+
+	public void setNombre_evento(String nombre_evento) {
+		this.nombre_evento = nombre_evento;
 	}
 	
 	

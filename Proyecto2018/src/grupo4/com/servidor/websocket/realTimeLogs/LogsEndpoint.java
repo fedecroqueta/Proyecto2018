@@ -2,7 +2,9 @@ package grupo4.com.servidor.websocket.realTimeLogs;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -20,6 +22,9 @@ public class LogsEndpoint {
 	private Integer cont = 5;
 	private ManejadorNotificaciones mnotis = new ManejadorNotificaciones();
 	private List<String> notificacionesRepetidasTemp = new ArrayList<String>();
+	
+	private static final Map<Integer, String> tiposEventos = new HashMap<Integer, String>();
+	
 	
 	@OnOpen
 	public void connect(Session session) throws IOException {
@@ -51,11 +56,22 @@ public class LogsEndpoint {
 	
 	//Esta funcion es con fines de probar la aplicacion, se debe remplazar con una validacion a nivel de BD
 	private String manejoNotifiacionesTemporal(List<Notis> notificaciones) {
-		for(Notis n : notificaciones) {
-			if(!notificacionesRepetidasTemp.contains(n.getCondicion_dispara())) {
-				notificacionesRepetidasTemp.add(n.getCondicion_dispara());
-				return "Se dispara Evento [ ram baja] Debido a ["+n.getCondicion_dispara()+"]"+n.getFecha_dispara();
+		Log log = null;
+		try {
+			log = new Log("controlNotisAngular.log", true);
+			
+			tiposEventos.put(1, "RAM");
+			tiposEventos.put(2, "CPU");
+			tiposEventos.put(3, "DISCO");
+			
+			for(Notis n : notificaciones) {
+				if(!notificacionesRepetidasTemp.contains(n.getCondicion_dispara())) {
+					notificacionesRepetidasTemp.add(n.getCondicion_dispara());
+					return "EVENTO ("+n.getNombre_evento().toUpperCase()+"). CAUSA "+tiposEventos.get(n.getTipo())+" "+n.getCondicion_dispara().substring(35)+". FECHA "+n.getFecha_dispara();
+				}
 			}
+		}catch(Throwable t) {
+			log.log("No se pudo enviar notificacion a angular debido a ["+t.getMessage()+"]", t);
 		}
 		return "";
 	}

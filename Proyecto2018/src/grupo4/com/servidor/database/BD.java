@@ -24,6 +24,8 @@ import grupo4.com.util.UtilBase;
 
 public class BD {
 
+	private static final Map<Integer, String> tiposEventos = new HashMap<Integer, String>();
+	
 	public 	List<EventoGConf> getConfEG(Log log, long idEvento){
 		String sql		= "";
 		List<EventoGConf> configuraciones = null;
@@ -769,8 +771,21 @@ public class BD {
 		boolean insertada = false;
 		try {
 			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
+			
+			tiposEventos.put(1, "RAM");
+			tiposEventos.put(2, "CPU");
+			tiposEventos.put(3, "DISCO");
+			
+			String condDispara = "Alerta! Evento("+notificicacion.getId_evento_global()+") ("+tiposEventos.get(notificicacion.getTipo())+") "
+					+ "debido a ["+notificicacion.getCondicion_dispara()+"]";
+			
 			sql = "INSERT INTO notificaciones ( id_evento_global, fecha_dispara, tipo, condicion_dispara, entregada, usuario_recibe) "
-					+ "VALUES ("+notificicacion.getId_evento_global()+", '"+notificicacion.getFecha_dispara()+"', "+notificicacion.getTipo()+", '"+notificicacion.getCondicion_dispara()+"', "+notificicacion.isEntregada()+", '"+notificicacion.getUsuario_recibe()+"') ";
+					+ "VALUES ("+notificicacion.getId_evento_global()
+					+", '"+notificicacion.getFecha_dispara()
+					+"', "+notificicacion.getTipo()
+					+", '"+condDispara
+					+"', "+notificicacion.isEntregada()+", '"
+					+notificicacion.getUsuario_recibe()+"') ";
 			st = c.createStatement();
 			rs = st.executeUpdate(sql);
 			if (rs>0) {
@@ -983,11 +998,12 @@ public class BD {
 			log.log("Se consulta si la notificacion debe ser enviada o ya fue procesada :["+idEvento+"]");
 			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String unaHoraAtras = sdf.format(new Date(System.currentTimeMillis() - (1 * 60 * 60 * 1000)));
+			//1 minuto = 60000 milisegundos
+			String unMinutoAtras = sdf.format(new Date(System.currentTimeMillis() - (60000)));
 			sql = "SELECT id_noti "
 					+ " FROM notificaciones "
 					+ " WHERE id_evento_global = "+idEvento+" "
-					+ " AND fecha_dispara>'"+unaHoraAtras+"' "
+					+ " AND fecha_dispara>'"+unMinutoAtras+"' "
 					+ " AND usuario_recibe='"+usuarioRecibe+"' AND entregada=true;";
 			st = c.createStatement();
 			rs = st.executeQuery(sql);
@@ -1017,7 +1033,11 @@ public class BD {
 			log.log("Recuperando lista de notificaiones para Angular en BD....");
 			notis = new ArrayList<Notis>();
 			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
-			sql = "SELECT * FROM notificaciones WHERE entregada_angular IS NULL ";
+			sql = "SELECT n.id_noti, n.id_evento_global, n.fecha_dispara, n.tipo, n.condicion_dispara, n.entregada, n.usuario_recibe, n.entregada_angular, e.nombre_evento "  
+					+"FROM notificaciones as N "
+					+"INNER JOIN eventos_globales as e ON n.id_evento_global=e.id_evento " 
+					+"WHERE entregada_angular IS NULL "
+					+ "ORDER BY  n.fecha_dispara ";
 			st = c.createStatement();
 			rs = st.executeQuery(sql);
 			while (rs.next()) {
@@ -1030,6 +1050,7 @@ public class BD {
 				noti.setTipo(rs.getShort("tipo"));
 				noti.setUsuario_recibe(rs.getString("usuario_recibe"));
 				noti.setEntregada_angular(rs.getBoolean("entregada_angular"));
+				noti.setNombre_evento(rs.getString("nombre_evento"));
 				notis.add(noti);
 			}
 			 update = "UPDATE notificaciones SET entregada_angular=true WHERE entregada_angular IS NULL";

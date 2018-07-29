@@ -218,5 +218,19 @@ public class LogREST {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("/infoAgenteMapa/{nodo}/{fechaInicio}/{fechaFin}")
+	public Response getAgenteMapa(@PathParam("nodo") String nodo, @PathParam("fechaInicio") String fechaInicio, @PathParam("fechaFin") String fechaFin) {
+		try {
+			List<LogAgente> agente = ml.getAgenteUsuarioPorFechaMapa(nodo, fechaInicio, fechaFin);
+			
+			return Response.ok(agente).build();
+		}
+		catch( Throwable t) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+		}
+	}
 
 }
