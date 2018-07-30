@@ -67,7 +67,7 @@ public class LogsEndpoint {
 			for(Notis n : notificaciones) {
 				if(!notificacionesRepetidasTemp.contains(n.getCondicion_dispara())) {
 					notificacionesRepetidasTemp.add(n.getCondicion_dispara());
-					return "EVENTO ("+n.getNombre_evento().toUpperCase()+"). CAUSA "+tiposEventos.get(n.getTipo())+" "+n.getCondicion_dispara().substring(35)+". FECHA "+n.getFecha_dispara();
+					return "EVENTO ("+n.getNombre_evento().toUpperCase()+"). CAUSA "+tiposEventos.get(n.getTipo())+" "+n.getCondicion_dispara().substring(23)+". FECHA "+n.getFecha_dispara()+ "?"+n.getUsuario_recibe();
 				}
 			}
 		}catch(Throwable t) {

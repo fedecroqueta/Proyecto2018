@@ -135,7 +135,7 @@ public class ProcesarAlertas {
 						}
 						
 						//Guardo notificaciones entregadas en BD
-						guardarNotificacionBD(log, usuariosNotificados, info, valor, idEvento, tipo, signo);		
+						guardarNotificacionBD(log, usuariosNotificados, info, valor, idEvento, tipo, signo, n);		
 
 					} else if (signo.equals("<")) { // Menor
 
@@ -164,7 +164,7 @@ public class ProcesarAlertas {
 						}
 						
 						//Guardo notificaciones entregadas en BD
-						guardarNotificacionBD(log, usuariosNotificados, info, valor, idEvento, tipo, signo);		
+						guardarNotificacionBD(log, usuariosNotificados, info, valor, idEvento, tipo, signo, n);		
 					} else { // Igual
 						
 						//Empiezo a preparar usuarios notificados para guardar esas ntois en BD
@@ -192,7 +192,7 @@ public class ProcesarAlertas {
 						}
 						
 						//Guardo notificaciones entregadas en BD
-						guardarNotificacionBD(log, usuariosNotificados, info, valor, idEvento, tipo, signo);
+						guardarNotificacionBD(log, usuariosNotificados, info, valor, idEvento, tipo, signo, n);
 					}
 				}
 			}
@@ -202,7 +202,7 @@ public class ProcesarAlertas {
 		}
 	}
 	
-	private void guardarNotificacionBD(Log log, List<Usuario> usuariosNotificados, InfoARevisarNodos info, double valor, long idEvento, int tipo, String signo ) {
+	private void guardarNotificacionBD(Log log, List<Usuario> usuariosNotificados, InfoARevisarNodos info, double valor, long idEvento, int tipo, String signo, String n ) {
 		BD base = new BD();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
 
@@ -228,7 +228,7 @@ public class ProcesarAlertas {
 			notificicacion.setUsuario_recibe(usuario_recibe_notificacion);
 			
 			//Inserto la notificacion en BD
-			base.insertNotificacion(log, notificicacion);
+			base.insertNotificacion(log, notificicacion, n);
 		}
 	}
 	

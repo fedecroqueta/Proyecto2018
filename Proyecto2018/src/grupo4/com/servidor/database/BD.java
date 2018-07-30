@@ -512,7 +512,12 @@ public class BD {
 		try {
 			log.log("Se consultan eventos y configuraciones ");
 			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
-			sql = 	"SELECT * FROM conf_eventos_globales ";
+			//sql = 	"SELECT * FROM conf_eventos_globales ";
+			sql = "SELECT c.id_evento, c.tipo, c.nivel, c.alerta, c.fecha_ultima_mod, c.usuario " + 
+					"FROM conf_eventos_globales as c " + 
+					"INNER JOIN eventos_globales as e ON c.id_evento = e.id_evento " + 
+					"WHERE e.activo";
+			
 			st = c.createStatement();
 			rs = st.executeQuery(sql);
 			eventsYconf = new HashMap<Long, EventoGConf>();
@@ -763,7 +768,7 @@ public class BD {
 		return datosUsuario;
 	}
 
-	public boolean insertNotificacion(Log log, Notis notificicacion) {
+	public boolean insertNotificacion(Log log, Notis notificicacion, String n) {
 		String sql		= "";
 		Connection c 	= null;
 		Statement st 	= null;
@@ -776,8 +781,8 @@ public class BD {
 			tiposEventos.put(2, "CPU");
 			tiposEventos.put(3, "DISCO");
 			
-			String condDispara = "Alerta! Evento("+notificicacion.getId_evento_global()+") ("+tiposEventos.get(notificicacion.getTipo())+") "
-					+ "debido a ["+notificicacion.getCondicion_dispara()+"]";
+			String condDispara = n+"-"+tiposEventos.get(notificicacion.getTipo())+" "
+					+ "- "+notificicacion.getCondicion_dispara()+"";
 			
 			sql = "INSERT INTO notificaciones ( id_evento_global, fecha_dispara, tipo, condicion_dispara, entregada, usuario_recibe) "
 					+ "VALUES ("+notificicacion.getId_evento_global()
@@ -843,9 +848,9 @@ public class BD {
 			notis = new ArrayList<Notis>();
 			c = Conexion.getInstancia().getConexion(log, UtilBase.DATASOURCE);
 			if(todos) {
-				sql = "SELECT * FROM notificaciones WHERE entregada = true ";
+				sql = "SELECT * FROM notificaciones WHERE entregada = true ORDER BY fecha_dispara DESC";
 			}else {
-				sql = "SELECT * FROM notificaciones WHERE usuario_recibe = '"+usuario+"' ";
+				sql = "SELECT * FROM notificaciones WHERE usuario_recibe = '"+usuario+"' ORDER BY fecha_dispara DESC";
 			}
 			st = c.createStatement();
 			rs = st.executeQuery(sql);
@@ -1004,15 +1009,16 @@ public class BD {
 					+ " FROM notificaciones "
 					+ " WHERE id_evento_global = "+idEvento+" "
 					+ " AND fecha_dispara>'"+unMinutoAtras+"' "
+					+ " AND tipo ="+tipo
 					+ " AND usuario_recibe='"+usuarioRecibe+"' AND entregada=true;";
 			st = c.createStatement();
 			rs = st.executeQuery(sql);
 			notiYaEntregada = (rs.next()) ? true : false;
 			if(notiYaEntregada) {
-				log.log("No se debe enviar notificacion de nuevo");
+				log.log("No se debe enviar notificacion de nuevo. SQL ["+sql+"]");
 				notiYaEntregada = true;
 			}else {
-				log.log("Se debe enviar notificacion");
+				log.log("Se debe enviar notificacion. SQL ["+sql+"]");
 			}
 		} catch(Throwable t) {
 			log.log("No es posible verificar si se debe enviar notificacion de evento["+idEvento+"] Error:["+t.getMessage()+"].SQL ["+sql+"]", t);
