@@ -239,7 +239,8 @@ public class ProcesarAlertas {
 		List<Usuario> usuariosNotificados = new ArrayList<Usuario>();
 		for (int us = 0; us < usuariosANotificar.size(); us++) {
 			Usuario aNoti = usuariosANotificar.get(us);
-			boolean notiYaFueEntregada = notiYaEntregada(log, idEvento,  tipo, aNoti.getUsername());
+			boolean notiYaFueEntregada = false;
+			//boolean notiYaFueEntregada = notiYaEntregada(log, idEvento,  tipo, aNoti.getUsername());
 			if (nivel == Constantes.MAIL && !notiYaFueEntregada) { // Mail
 				Email.enviarMail(aNoti.getUsername(), aNoti.getMail(), cuerpoMail);
 			} else if (nivel == Constantes.MAIL_Y_SMS && !notiYaFueEntregada ) { // Mail y sms
